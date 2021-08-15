@@ -35,4 +35,4 @@ In the test folder and example folder respectively
 
 To run the code, place the lua dll file in these two folders
 
-This is a simple and concise use of dart ffi api call lua dynamic lib file to run lua, so please modify and add ffi api as needed
+This is a simple and concise use of dart ffi api call lua dynamic lib file to run lua, so please modify and add link lua dynamic lib code as needed
