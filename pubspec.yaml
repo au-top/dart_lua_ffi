@@ -1,0 +1,21 @@
+name: dart_lua_ffi
+description: dart use ffi call lua5.4
+version: 0.1.0
+repository: https://github.com/au-top/dart_lua_ffi
+environment:
+    sdk: ">=2.18.0 <3.0.0"
+
+dev_dependencies:
+    ffigen: ^7.2.4
+    lints: ^1.0.0
+    test: ^1.16.0
+dependencies:
+    ffi: ^2.0.1
+ffigen:
+    output: "lib/generated_bindings.dart"
+    headers:
+        entry-points:
+            - "c_header/lauxlib.h"
+            - "c_header/lua.h"
+            - "c_header/lualib.h"
+    name: LuaFFIBind
