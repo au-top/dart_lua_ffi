@@ -15,24 +15,40 @@ version `5.4` is currently supported here
 
 
 ```dart
-    final assetsPath="assets/";
-    final luaFFI = LuaFFI(dynamicLibraryPath: "${assetsPath}lua54.dll");
-    final lp = luaFFI.luaLNewState();
-    luaFFI.luaOpenLibs(lp);
-    luaFFI.luaLLoadString(lp, "print(\"HelloWorld I'm Lua\")".toNativeUtf8());
-    luaFFI.luaPcallK(lp, 0, -1, 0, LUA_MULTRET, 0);
+import 'dart:ffi';
+
+import 'package:dart_lua_ffi/dart_lua_ffi.dart';
+import 'package:dart_lua_ffi/generated_bindings.dart';
+import 'package:ffi/ffi.dart';
+
+const dartPrintPrefix = "dartLog: ";
+final NULLP = Pointer.fromAddress(0);
+void main() {
+  final luaFFI = createLua("assets/lua54.dll");
+  final lp = luaFFI.luaL_newstate();
+  luaFFI.luaL_openlibs(lp);
+
+  luaFFI.luaL_loadfilex(lp, "assets/hw.lua".toNativeUtf8().cast<Char>(), NULLP.cast());
+  luaFFI.lua_pushnumber(lp, 1.2);
+  luaFFI.lua_setglobal(lp, "dartvar".toNativeUtf8().cast());
+  luaFFI.lua_pcallk(lp, 0, -1, 0, LUA_MULTRET, NULLP.cast());
+  luaFFI.lua_settop(lp, 0);
+  luaFFI.lua_getglobal(lp, "helloworldCall".toNativeUtf8().cast());
+  luaFFI.lua_pcallk(lp, 0, 1, 0, LUA_MULTRET, NULLP.cast());
+  {
+    final runFunctionResult = luaFFI.lua_tonumberx(lp, 0, NULLP.cast());
+    print("$dartPrintPrefix run function return result value  ${runFunctionResult}");
+  }
+  // LuaPrintPrefix definition in  [assets/hw.lua]  file
+  luaFFI.luaL_loadstring(lp, "print(LuaPrintPrefix..\"from dart print \")".toNativeUtf8().cast());
+  luaFFI.lua_pcallk(lp, 0, -1, 0, LUA_MULTRET, NULLP.cast());
+  {
+    final fromStringLoadCodeResult = luaFFI.luaL_loadstring(lp, "print(\"my from dart code load print \")".toNativeUtf8().cast());
+    print("$dartPrintPrefix load error return number value : ${fromStringLoadCodeResult}");
+  }
+  luaFFI.lua_close(lp);
+}
+
 ```
 
 Check the example folder in the warehouse and place the required Lua dynamic link file in the assets folder to run the example
-
-
-
-## Additional information
-
-There are two assets files
-
-In the test folder and example folder respectively
-
-To run the code, place the lua dll file in these two folders
-
-This is a simple and concise use of dart ffi api call lua dynamic lib file to run lua, so please modify and add link lua dynamic lib code as needed
